@@ -2,23 +2,42 @@
 #include<locale.h>
 #include<windows.h>
 #include<math.h>
-//Структура "Комплексное число содержит 2 переменные: мнимая и весщественная части числа"
-typedef struct{
-	float mnimaya_chast;
-	float vechestv_chast;
-}komplex_number;
-//Функции для работы с комплексными числами
+#include <string>
+#include <iostream>
 
-komplex_number Init();//Инициализация
-komplex_number Read();//Ввод с клавиатуры
-void Display (komplex_number A);//Вывод на экран
-komplex_number Add(komplex_number a, komplex_number b);//Функция сложения двух комплексных чисел
-komplex_number Raz(komplex_number a, komplex_number b);//Функция Вычитания двух комплексных чисел
-void compare(komplex_number a, komplex_number b);//Функция Сравнения двух комплексных чисел
+using namespace std;
+//Структура "Шахматная фигура" содержит 3 переменные: ценность в пешках, название и pawn
+typedef struct{
+	int value;
+	char name[20];
+	//Если pawn = true: фигура является пешкой, если false, то не пешкой 
+	bool pawn = false;
+}chess_figure;
+//Функции для работы со структурой
+
+chess_figure Init();//Инициализация
+chess_figure Read();//Ввод с клавиатуры
+void Display (chess_figure A);//Вывод на экран
+chess_figure Add(chess_figure a, chess_figure b);//Функция сложения ценностей фигур
+void compare(chess_figure a, chess_figure b);//Сравнение двух фигур
+chess_figure pawn_promotion();//Превращение пешки 
+
+char* NAMES[5];
+char a1[] = "Пешка";
+char a2[] = "Конь";
+char a3[] = "Слон";
+char a4[] = "Ладья";
+char a5[] = "Ферзь";
 int main()
 {
-	komplex_number A, B;
-	komplex_number Sum,Raznost;
+	NAMES[0] = a1;
+	NAMES[1] = a2;
+	NAMES[2] = a3;
+	NAMES[3] = a4;
+	NAMES[4] = a5;
+	
+	chess_figure A, B;
+	chess_figure Sum,Raznost;
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 	setlocale(LC_ALL, "Rus");
@@ -33,15 +52,7 @@ int main()
 
 	
 	Sum = Add(A, B);
-	puts("A + B =");
 	Display(Sum);
-	puts("");
-	system("pause");
-
-	
-	Raznost = Raz(A, B);
-	puts("A - B =");
-	Display(Raznost);
 	puts("");
 	system("pause");
 
@@ -50,82 +61,131 @@ int main()
 	system("pause");
 
 	system("cls");
-	puts("Сейчас вы введёте денамическую переменную");
+	
+
+	if (A.pawn)
+	{
+		A = pawn_promotion();
+		Display(A);
+		system("pause");
+	}
+
+
+	system("cls");
+	puts("Сейчас вы введёте динамическую переменную\n");
 	system("pause");
-	komplex_number* Dim;
-	Dim = (komplex_number *)malloc(sizeof(komplex_number));
-	*Dim = Read();
+	chess_figure* Dim;
+	Dim = (chess_figure *)malloc(sizeof(chess_figure));
+
+	(*Dim) = Read();
 	Display(*Dim);
 
+	puts("");
+	system("pause");
+
+	system("cls");
 
 }
-komplex_number Init()
+chess_figure Init()
 {
-	komplex_number A;
-	A = { 2,5 };
+	chess_figure A;
+	A = { 3,"Конь\n"};
 	return A;
 }
-komplex_number Read()
+chess_figure Read()
 {
-	komplex_number A;
-	puts("Введите весщественную часть числа");
-	scanf("%f", &A.vechestv_chast);
-	while (getchar() != '\n');
-	system("cls");
-	puts("Введите мнимую часть числа");
-	scanf("%f", &A.mnimaya_chast);
-	while (getchar() != '\n');
+	chess_figure A;
+	int vibor;
+	puts("Название фигуры");
+	for (int i = 0; i < 5; i++)
+	{
+		printf("%d ", i + 1);
+		puts(NAMES[i]);
+		
+	}
+
+	cin >> vibor;
+	strcpy(A.name,NAMES[vibor - 1]);
+	switch (vibor)
+	{
+	case 1: {A.value = 1; A.pawn = true; }break;
+	case 2: {A.value = 3; }break;
+	case 3: {A.value = 3; }break;
+	case 4: {A.value = 5; }break;
+	case 5: {A.value = 9; }break;
+	}
 	system("cls");
 	return A;
 }
-void Display(komplex_number A)
+void Display(chess_figure A)
 {
-	printf(" %.1fi  + %.1f", A.mnimaya_chast, A.vechestv_chast);
+	puts(A.name);
+	printf("\b Ценность %d", A.value);
 	puts("");
 }
-komplex_number Add(komplex_number a, komplex_number b)
+chess_figure Add(chess_figure a, chess_figure b)
 {
 	system("cls");
-	komplex_number Summa;
-	Summa.mnimaya_chast = a.mnimaya_chast + b.mnimaya_chast;
-	Summa.vechestv_chast = a.vechestv_chast + b.vechestv_chast;
+	chess_figure Summa;
+	Summa.value = a.value + b.value;
+	strcpy(Summa.name, a.name);
+	strcat(Summa.name, " и ");
+	strcat(Summa.name, b.name);
 	return Summa;
 }
 
 
-komplex_number Raz(komplex_number a, komplex_number b)
+
+void compare(chess_figure a, chess_figure b)
 {
 	system("cls");
-	komplex_number Raznost;
-	Raznost.mnimaya_chast = a.mnimaya_chast - b.mnimaya_chast;
-	Raznost.vechestv_chast = a.vechestv_chast - b.vechestv_chast;
-	return Raznost;
+	char comp[20];
+
+	
+	
+	if (a.value>b.value)
+	{
+		strcpy(comp, " Лучше чем ");
+	}
+	if (a.value < b.value)
+	{
+		strcpy(comp ," Хуже чем ");
+	}
+	if (a.value == b.value)
+	{
+		strcpy(comp," не хуже и не лучше чем ");
+	}
+	printf("%s %s %s", a.name, comp, b.name);
+	
 }
-void compare(komplex_number a, komplex_number b)
+
+chess_figure pawn_promotion()
 {
+	chess_figure A;
+	printf("Ваша пешка дошла до конца доски\nВыбирите фигуру которой она станет\n\n");
+	int vibor;
+	puts("Название фигуры");
+	for (int i = 1; i < 5; i++)
+	{
+		printf("%d ", i);
+		puts(NAMES[i]);
+
+	}
+	cin >> vibor;
+	strcpy(A.name, NAMES[vibor]);
+	switch (vibor)
+	{
+	
+	case 1: {A.value = 3; }break;
+	case 2: {A.value = 3; }break;
+	case 3: {A.value = 5; }break;
+	case 4: {A.value = 9; }break;
+	}
 	system("cls");
-	char znak;
+	return A;
 
-	printf("Сравнение чисел %.1fi + %.1f  и  %.1fi + %.1f \nпо модулю\n", a.mnimaya_chast, a.vechestv_chast, b.mnimaya_chast, b.vechestv_chast);
-	float amod = sqrt(a.vechestv_chast * a.vechestv_chast + a.mnimaya_chast * a.mnimaya_chast);
-	float bmod = sqrt(b.vechestv_chast * b.vechestv_chast + b.mnimaya_chast * b.mnimaya_chast);
-	if (amod > bmod)
-	{
-		znak = '>';
-	}
-	if (amod < bmod)
-	{
-		znak = '<';
-	}
-	if (amod == bmod)
-	{
-		znak = '=';
-	}
 
-	printf("%.1fi + %.1f  %c  %.1fi + %.1f", a.mnimaya_chast, a.vechestv_chast, znak, b.mnimaya_chast, b.vechestv_chast);
 }
-
-
 
 
 
